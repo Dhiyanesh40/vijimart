@@ -15,8 +15,10 @@ const getRazorpayInstance = () => {
   const keySecret = process.env.RAZORPAY_KEY_SECRET;
 
   if (!keyId || !keySecret) {
-    throw new Error('Razorpay credentials not configured. Please set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in .env');
-  }
+  return res.status(500).json({
+    message: "Payment service not configured"
+  });
+}
 
   return new Razorpay({
     key_id: keyId,
