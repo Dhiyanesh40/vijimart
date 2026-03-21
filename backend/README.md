@@ -65,7 +65,11 @@ PORT=5000
 NODE_ENV=development
 
 # Frontend URL (for CORS and email links)
+# Development
 FRONTEND_URL=http://localhost:5173
+
+# Production (when deployed to Vercel)
+# FRONTEND_URL=https://vijimart.vercel.app
 ```
 
 ### 5. Seed the Database
@@ -94,7 +98,7 @@ Production mode:
 npm start
 ```
 
-The server will start on `http://localhost:5000`
+The server will start on `http://localhost:5000` (development)
 
 ## API Endpoints
 

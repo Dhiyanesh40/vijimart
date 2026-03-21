@@ -38,7 +38,7 @@ A complete MERN stack e-commerce solution for Sri Vijiyalaxmi Super Mart in Chen
    ```bash
    npm run dev
    ```
-   Server runs on `http://localhost:5000`
+   Server runs on `http://localhost:5000` (development)
 
 ### Frontend Setup
 
@@ -50,7 +50,11 @@ A complete MERN stack e-commerce solution for Sri Vijiyalaxmi Super Mart in Chen
 2. **Configure environment:**
    Create `.env` in root directory:
    ```env
+   # Development
    VITE_API_URL=http://localhost:5000/api
+
+   # Production (for Vercel/Railway)
+   VITE_API_URL=https://your-railway-backend-url/api
    ```
 
 3. **Start frontend:**

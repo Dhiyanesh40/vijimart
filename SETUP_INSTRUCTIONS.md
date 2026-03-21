@@ -117,7 +117,7 @@ This creates:
 npm run dev
 ```
 
-✅ Backend running on: **http://localhost:5000**
+✅ Backend running on: **http://localhost:5000** (development)
 
 ---
 
@@ -142,7 +142,11 @@ This will install:
 The `.env` file should already exist with:
 
 ```env
+# Development
 VITE_API_URL=http://localhost:5000/api
+
+# Production (update when deploying to Vercel)
+# VITE_API_URL=https://your-railway-backend/api
 ```
 
 ### 4. Start frontend server

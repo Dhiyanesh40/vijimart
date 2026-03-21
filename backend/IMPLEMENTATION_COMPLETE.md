@@ -192,7 +192,7 @@ Beyond what you asked for, the system also includes:
 
 | Component | Status |
 |-----------|--------|
-| Backend Server | ✅ Running on port 5000 |
+| Backend Server | ✅ Running on port 5000 (development) |
 | Database | ✅ MongoDB Connected |
 | Products with Images | ✅ 41/41 (100%) |
 | Auto-Assignment | ✅ Enabled |
@@ -205,7 +205,7 @@ Beyond what you asked for, the system also includes:
 ## 💡 Quick Commands
 
 ```bash
-# View all product images
+# View all product images (development)
 curl http://localhost:5000/api/products | jq '.[].imageUrl'
 
 # Clear all images (if you want to start over)
@@ -215,8 +215,11 @@ node src/scripts/clearAllImages.js
 # Reassign images using search
 node src/scripts/assignImagesFromGoogle.js
 
-# Start backend server
-node src/server.js
+# Start backend server (development)
+npm run dev
+
+# Start backend server (production)
+npm start
 ```
 
 ---

@@ -248,12 +248,9 @@ Production mode:
 npm start
 ```
 
-Server will run on: **http://localhost:5000**
+Server will run on: **http://localhost:5000** (development)
 
-Test health check:
-```bash
-curl http://localhost:5000/health
-```
+For production deployment, see [Deployment](#-deployment) section below.
 
 ### Frontend Setup
 
@@ -272,7 +269,14 @@ npm install
 Create `.env` file in root directory:
 
 ```env
+# Development (backend running locally)
 VITE_API_URL=http://localhost:5000/api
+```
+
+For production deployment to Vercel:
+```env
+# Production (Railway backend)
+VITE_API_URL=https://your-railway-backend-url/api
 ```
 
 #### 4. Start development server
@@ -280,7 +284,18 @@ VITE_API_URL=http://localhost:5000/api
 npm run dev
 ```
 
-App will run on: **http://localhost:5173**
+App will run on: **http://localhost:5173** (development)
+
+## 🚀 Deployment
+
+### Production Environment Setup
+
+When deploying to Vercel with Railway backend:
+
+**Vercel Environment Variables:**
+```env
+VITE_API_URL=https://your-railway-backend-url/api
+```
 
 ## 👥 Login Credentials
 
@@ -652,13 +667,15 @@ npm run test
 2. **Import GitHub repository**
 3. **Set environment variable:**
    ```env
-   VITE_API_URL=https://your-backend-url.com/api
+   VITE_API_URL=https://vijimart-production.up.railway.app/api
    ```
+   *(Replace with your actual Railway backend URL)*
 4. **Build settings:**
    - Build command: `npm run build`
    - Output directory: `dist`
    - Install command: `npm install`
 5. **Deploy**
+6. **Redeploy** if you change the `VITE_API_URL` environment variable
 
 ### MongoDB Atlas Production
 
