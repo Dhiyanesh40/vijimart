@@ -329,24 +329,58 @@ class AIGroceryPlanner {
   }
 
   /**
-   * Calculate nutrition balance score (simplified)
+   * Calculate nutrition balance score based on dietary variety
    */
   static calculateNutritionScore(groceryList) {
-    const categories = groceryList.map(item => item.category);
-    const essentialCategories = ['Groceries', 'Vegetables', 'Fruits', 'Dairy'];
-    
-    const coveredEssentials = essentialCategories.filter(cat => 
-      categories.some(c => c.toLowerCase().includes(cat.toLowerCase()))
-    );
+    if (!groceryList || groceryList.length === 0) {
+      return {
+        score: 0,
+        message: 'Add items to your list to see nutritional balance',
+        coveredCategories: []
+      };
+    }
 
-    const score = (coveredEssentials.length / essentialCategories.length) * 100;
-    
+    // Define nutritional groups and keywords to look for
+    const nutritionGroups = {
+      'vegetables': ['vegetable', 'brinjal', 'tomato', 'onion', 'carrot', 'spinach', 'lettuce', 'cabbage', 'bell pepper', 'okra', 'pumpkin', 'bitter gourd'],
+      'fruits': ['fruit', 'apple', 'banana', 'orange', 'mango', 'guava', 'papaya', 'grape', 'pomegranate', 'watermelon', 'kiwi', 'berries'],
+      'proteins': ['dal', 'lentil', 'bean', 'egg', 'meat', 'chicken', 'fish', 'paneer', 'tofu', 'chickpea'],
+      'dairy': ['milk', 'yogurt', 'cheese', 'ghee', 'butter', 'cream', 'paneer', 'curd'],
+      'grains': ['rice', 'wheat', 'flour', 'bread', 'pasta', 'noodles', 'cereal', 'oats'],
+      'fats & oils': ['oil', 'ghee', 'butter', 'coconut', 'sesame'],
+      'spices & condiments': ['salt', 'sugar', 'spice', 'sauce', 'masala', 'chutney']
+    };
+
+    const productNames = groceryList.map(item => item.name.toLowerCase());
+    const coveredGroups = {};
+    let totalGroupsCovered = 0;
+
+    // Check which nutritional groups are covered
+    for (const [group, keywords] of Object.entries(nutritionGroups)) {
+      const hasCoverage = keywords.some(keyword =>
+        productNames.some(name => name.includes(keyword))
+      );
+
+      if (hasCoverage) {
+        coveredGroups[group] = true;
+        totalGroupsCovered++;
+      }
+    }
+
+    // Calculate score based on covered groups (each group worth ~14%)
+    const score = Math.round((totalGroupsCovered / Object.keys(nutritionGroups).length) * 100);
+
+    const message =
+      score >= 85 ? '🌟 Excellent nutritional balance! Well-rounded diet with all food groups.' :
+      score >= 70 ? '✓ Good nutritional variety! Missing a few food groups.' :
+      score >= 50 ? '⚠ Consider adding more variety for better nutrition.' :
+      score >= 25 ? '📌 Try to include vegetables, fruits, and proteins.' :
+      '🍽️ Add more diverse food items for balanced nutrition';
+
     return {
-      score: Math.round(score),
-      message: score >= 75 ? 'Excellent nutritional balance!' : 
-               score >= 50 ? 'Good nutritional variety' : 
-               'Consider adding more variety',
-      coveredCategories: coveredEssentials
+      score,
+      message,
+      coveredCategories: Object.keys(coveredGroups)
     };
   }
 

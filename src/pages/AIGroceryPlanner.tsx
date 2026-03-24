@@ -130,18 +130,20 @@ const AIGroceryPlanner = () => {
     if (!groceryList?.groceryList) return;
 
     try {
-      let addedCount = 0;
-
-      for (const item of groceryList.groceryList) {
+      // Add all items to cart in parallel instead of sequentially
+      const addPromises = groceryList.groceryList.map(item => {
         if (item.productId) {
-          try {
-            await addToCart(item.productId, item.quantity || 1);
-            addedCount++;
-          } catch (err) {
-            console.error(`Failed to add ${item.name}:`, err);
-          }
+          return addToCart(item.productId, item.quantity || 1)
+            .catch(err => {
+              console.error(`Failed to add ${item.name}:`, err);
+              return null;
+            });
         }
-      }
+        return Promise.resolve(null);
+      });
+
+      const results = await Promise.all(addPromises);
+      const addedCount = results.filter(r => r !== null).length;
 
       toast.success(`${addedCount} items added to cart!`);
       navigate('/cart');
@@ -222,11 +224,11 @@ const AIGroceryPlanner = () => {
             {/* Shopping Duration */}
             <Card className="p-6 shadow-soft">
               <h3 className="text-xl font-display font-bold mb-4 flex items-center gap-2">
-                <CalendarDays className="h-5 w-5 text-primary" /> Shopping Duration
+                <CalendarDays className="h-5 w-5 text-primary" /> Days to Shop For
               </h3>
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Days to Shop For</span>
+                  <span className="text-muted-foreground">Number of Days</span>
                   <span className="text-2xl font-bold text-primary">{shoppingDays} days</span>
                 </div>
                 <Slider
@@ -354,7 +356,7 @@ const AIGroceryPlanner = () => {
                         key={idx}
                         className="flex items-center justify-between p-3 bg-muted rounded-lg hover:bg-muted/70 transition"
                       >
-                        <div className="flex-1">
+                        <div>
                           <div className="font-semibold">{item.name}</div>
                            <div className="text-sm text-muted-foreground">
                              Qty: {item.quantity} • ₹{item.price} each
@@ -367,7 +369,6 @@ const AIGroceryPlanner = () => {
                         </div>
                         <div className="text-right">
                           <div className="font-bold text-primary">₹{item.totalPrice}</div>
-                          <div className="text-xs text-muted-foreground">Score: {item.aiScore}</div>
                         </div>
                       </div>
                     ))}

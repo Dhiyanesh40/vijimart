@@ -55,6 +55,7 @@ const CustomerDashboard: React.FC = () => {
     address: "",
   });
   const [editMode, setEditMode] = useState(false);
+  const [selectedCartItems, setSelectedCartItems] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (authLoading) return;
@@ -159,6 +160,47 @@ const CustomerDashboard: React.FC = () => {
     } catch (error: any) {
       toast({ title: "Cannot Return Order", description: error.response?.data?.message || "Failed to submit return request", variant: "destructive" });
     }
+  };
+
+  // Cart multi-select functions
+  const toggleCartItemSelection = (itemId: string) => {
+    setSelectedCartItems(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(itemId)) {
+        newSet.delete(itemId);
+      } else {
+        newSet.add(itemId);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleSelectAllCartItems = () => {
+    if (selectedCartItems.size === cartItems.length) {
+      setSelectedCartItems(new Set());
+    } else {
+      const allIds = new Set(cartItems.map(item => item.id || item._id));
+      setSelectedCartItems(allIds);
+    }
+  };
+
+  const deleteSelectedCartItems = () => {
+    selectedCartItems.forEach(itemId => {
+      const item = cartItems.find(i => (i.id || i._id) === itemId);
+      if (item) {
+        const productId = typeof item.product === 'string' ? item.product : (item.product?._id || item.product?.id);
+        removeItem(productId);
+      }
+    });
+    setSelectedCartItems(new Set());
+  };
+
+  const deleteAllCartItems = () => {
+    cartItems.forEach(item => {
+      const productId = typeof item.product === 'string' ? item.product : (item.product?._id || item.product?.id);
+      removeItem(productId);
+    });
+    setSelectedCartItems(new Set());
   };
 
   if (authLoading || !user || isAdmin) return null;
@@ -285,8 +327,61 @@ const CustomerDashboard: React.FC = () => {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {cartItems.map((item: any) => (
-                      <div key={item.id || item._id} className="bg-background border border-border rounded-lg p-4 flex items-center gap-4">
+                    {/* Cart Header with Multi-Select */}
+                    {cartItems.length > 0 && (
+                      <div className="bg-background border border-border rounded-lg p-4 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={toggleSelectAllCartItems}
+                            className="flex items-center justify-center w-5 h-5 border border-input rounded"
+                          >
+                            {selectedCartItems.size === cartItems.length && cartItems.length > 0 && (
+                              <span className="text-xs">✓</span>
+                            )}
+                          </button>
+                          <span className="text-sm text-muted-foreground">
+                            {selectedCartItems.size > 0 ? `${selectedCartItems.size} selected` : 'Select All'}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {selectedCartItems.size > 0 && (
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={deleteSelectedCartItems}
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Delete ({selectedCartItems.size})
+                            </Button>
+                          )}
+                          {cartItems.length > 0 && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-destructive hover:text-destructive"
+                              onClick={deleteAllCartItems}
+                            >
+                              Delete All
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Cart Items */}
+                    {cartItems.map((item: any) => {
+                      const itemId = item.id || item._id;
+                      const isSelected = selectedCartItems.has(itemId);
+                      return (
+                      <div key={itemId} className="bg-background border border-border rounded-lg p-4 flex items-center gap-4">
+                        <button
+                          onClick={() => toggleCartItemSelection(itemId)}
+                          className={`flex items-center justify-center w-5 h-5 border rounded flex-shrink-0 transition-colors ${
+                            isSelected ? 'bg-primary border-primary' : 'border-input'
+                          }`}
+                        >
+                          {isSelected && <span className="text-xs text-primary-foreground">✓</span>}
+                        </button>
                         <div 
                           className="h-16 w-16 bg-muted rounded flex items-center justify-center flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
                           onClick={() => {
@@ -336,7 +431,8 @@ const CustomerDashboard: React.FC = () => {
                           </Button>
                         </div>
                       </div>
-                    ))}
+                      );
+                    })}
                     <div className="border-t border-border pt-4 flex items-center justify-between">
                       <div>
                         <p className="text-lg font-bold text-foreground">Total: ₹{cartTotal.toFixed(2)}</p>

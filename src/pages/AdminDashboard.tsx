@@ -282,6 +282,11 @@ const AdminDashboard: React.FC = () => {
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-card border border-border rounded-lg p-4 cursor-pointer hover:border-accent/40 hover:shadow-md transition-all" onClick={() => handleTabChange('analytics')}>
+            <Users className="h-5 w-5 text-accent mb-2" />
+            <p className="text-2xl font-bold text-foreground">₹{orders.reduce((s, o) => s + Number(o.total), 0).toFixed(0)}</p>
+            <p className="text-xs text-muted-foreground">Revenue</p>
+          </div>
           <div className="bg-card border border-border rounded-lg p-4 cursor-pointer hover:border-primary/40 hover:shadow-md transition-all" onClick={() => handleTabChange('products')}>
             <Package className="h-5 w-5 text-primary mb-2" />
             <p className="text-2xl font-bold text-foreground">{products.length}</p>
@@ -296,11 +301,6 @@ const AdminDashboard: React.FC = () => {
             <ShoppingCart className="h-5 w-5 text-primary mb-2" />
             <p className="text-2xl font-bold text-foreground">{orders.length}</p>
             <p className="text-xs text-muted-foreground">Orders</p>
-          </div>
-          <div className="bg-card border border-border rounded-lg p-4 cursor-pointer hover:border-accent/40 hover:shadow-md transition-all" onClick={() => handleTabChange('analytics')}>
-            <Users className="h-5 w-5 text-accent mb-2" />
-            <p className="text-2xl font-bold text-foreground">₹{orders.reduce((s, o) => s + Number(o.total), 0).toFixed(0)}</p>
-            <p className="text-xs text-muted-foreground">Revenue</p>
           </div>
         </div>
 

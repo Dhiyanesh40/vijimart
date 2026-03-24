@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import Layout from "@/components/layout/Layout";
@@ -10,6 +10,47 @@ const Cart: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { items, loading, cartTotal, updateQuantity, removeItem } = useCart();
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+
+  const toggleItemSelection = (itemId: string) => {
+    setSelectedItems(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(itemId)) {
+        newSet.delete(itemId);
+      } else {
+        newSet.add(itemId);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedItems.size === items.length) {
+      setSelectedItems(new Set());
+    } else {
+      const allIds = new Set(items.map(item => item.id || item._id));
+      setSelectedItems(allIds);
+    }
+  };
+
+  const deleteSelected = () => {
+    selectedItems.forEach(itemId => {
+      const item = items.find(i => (i.id || i._id) === itemId);
+      if (item) {
+        const productId = typeof item.product === 'string' ? item.product : (item.product?._id || item.product?.id);
+        removeItem(productId);
+      }
+    });
+    setSelectedItems(new Set());
+  };
+
+  const deleteAll = () => {
+    items.forEach(item => {
+      const productId = typeof item.product === 'string' ? item.product : (item.product?._id || item.product?.id);
+      removeItem(productId);
+    });
+    setSelectedItems(new Set());
+  };
 
   if (!user) {
     return (
@@ -52,9 +93,62 @@ const Cart: React.FC = () => {
         ) : (
           <div className="grid md:grid-cols-3 gap-6">
             <div className="md:col-span-2 space-y-3">
-              {items.map((item) => (
-                <div key={item.id || item._id} className="bg-card border border-border rounded-lg p-4 flex items-center gap-4">
-                  <div 
+              {/* Cart Header with Select All and Delete Options */}
+              {items.length > 0 && (
+                <div className="bg-card border border-border rounded-lg p-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={toggleSelectAll}
+                      className="flex items-center justify-center w-5 h-5 border border-input rounded"
+                    >
+                      {selectedItems.size === items.length && items.length > 0 && (
+                        <span className="text-xs">✓</span>
+                      )}
+                    </button>
+                    <span className="text-sm text-muted-foreground">
+                      {selectedItems.size > 0 ? `${selectedItems.size} selected` : 'Select All'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {selectedItems.size > 0 && (
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={deleteSelected}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete ({selectedItems.size})
+                      </Button>
+                    )}
+                    {items.length > 0 && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-destructive hover:text-destructive"
+                        onClick={deleteAll}
+                      >
+                        Delete All
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Cart Items */}
+              {items.map((item) => {
+                const itemId = item.id || item._id;
+                const isSelected = selectedItems.has(itemId);
+                return (
+                <div key={itemId} className="bg-card border border-border rounded-lg p-4 flex items-center gap-4">
+                  <button
+                    onClick={() => toggleItemSelection(itemId)}
+                    className={`flex items-center justify-center w-5 h-5 border rounded flex-shrink-0 transition-colors ${
+                      isSelected ? 'bg-primary border-primary' : 'border-input'
+                    }`}
+                  >
+                    {isSelected && <span className="text-xs text-primary-foreground">✓</span>}
+                  </button>
+                  <div
                     className="h-16 w-16 bg-muted rounded flex items-center justify-center flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
                     onClick={() => {
                       const productId = typeof item.product === 'string' ? item.product : (item.product?._id || item.product?.id);
@@ -67,7 +161,7 @@ const Cart: React.FC = () => {
                       <span className="text-xs text-muted-foreground">No img</span>
                     )}
                   </div>
-                  <div 
+                  <div
                     className="flex-1 min-w-0 cursor-pointer hover:opacity-80 transition-opacity"
                     onClick={() => {
                       const productId = typeof item.product === 'string' ? item.product : (item.product?._id || item.product?.id);
@@ -103,7 +197,8 @@ const Cart: React.FC = () => {
                     </Button>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Order Summary */}

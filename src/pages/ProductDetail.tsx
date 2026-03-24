@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { productsAPI } from "@/services/api";
 import { useCart } from "@/hooks/useCart";
 import { useFavorites } from "@/hooks/useFavorites";
+import { useAuth } from "@/contexts/AuthContext";
 import AddToCartDialog from "@/components/products/AddToCartDialog";
 
 const ProductDetail: React.FC = () => {
@@ -13,6 +14,7 @@ const ProductDetail: React.FC = () => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const { isFavorite, toggleFavorite, loading: favLoading } = useFavorites();
+  const { user, isAdmin } = useAuth();
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [showQuantityDialog, setShowQuantityDialog] = useState(false);
@@ -122,24 +124,28 @@ const ProductDetail: React.FC = () => {
             )}
 
             <div className="flex gap-3">
-              <Button
-                size="lg"
-                variant="outline"
-                className="w-12 h-12 p-0"
-                onClick={() => toggleFavorite(product.id || product._id)}
-                disabled={favLoading}
-              >
-                <Heart className={`h-5 w-5 ${isFavorite(product.id || product._id) ? 'fill-red-500 text-red-500' : ''}`} />
-              </Button>
-              <Button
-                size="lg"
-                className="flex-1"
-                disabled={!(product.inStock ?? product.in_stock ?? true)}
-                onClick={() => setShowQuantityDialog(true)}
-              >
-                <ShoppingCart className="h-4 w-4 mr-2" />
-                Add to Cart
-              </Button>
+              {!isAdmin && (
+                <>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="w-12 h-12 p-0"
+                    onClick={() => toggleFavorite(product.id || product._id)}
+                    disabled={favLoading}
+                  >
+                    <Heart className={`h-5 w-5 ${isFavorite(product.id || product._id) ? 'fill-red-500 text-red-500' : ''}`} />
+                  </Button>
+                  <Button
+                    size="lg"
+                    className="flex-1"
+                    disabled={!(product.inStock ?? product.in_stock ?? true)}
+                    onClick={() => setShowQuantityDialog(true)}
+                  >
+                    <ShoppingCart className="h-4 w-4 mr-2" />
+                    Add to Cart
+                  </Button>
+                </>
+              )}
             </div>
 
             <AddToCartDialog
