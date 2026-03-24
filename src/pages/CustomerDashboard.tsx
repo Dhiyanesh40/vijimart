@@ -184,22 +184,28 @@ const CustomerDashboard: React.FC = () => {
     }
   };
 
-  const deleteSelectedCartItems = () => {
-    selectedCartItems.forEach(itemId => {
+  const deleteSelectedCartItems = async () => {
+    // Delete items sequentially to avoid server overload
+    for (const itemId of selectedCartItems) {
       const item = cartItems.find(i => (i.id || i._id) === itemId);
       if (item) {
         const productId = typeof item.product === 'string' ? item.product : (item.product?._id || item.product?.id);
-        removeItem(productId);
+        await removeItem(productId);
+        // Small delay between requests
+        await new Promise(resolve => setTimeout(resolve, 100));
       }
-    });
+    }
     setSelectedCartItems(new Set());
   };
 
-  const deleteAllCartItems = () => {
-    cartItems.forEach(item => {
+  const deleteAllCartItems = async () => {
+    // Delete items sequentially to avoid server overload
+    for (const item of cartItems) {
       const productId = typeof item.product === 'string' ? item.product : (item.product?._id || item.product?.id);
-      removeItem(productId);
-    });
+      await removeItem(productId);
+      // Small delay between requests
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
     setSelectedCartItems(new Set());
   };
 

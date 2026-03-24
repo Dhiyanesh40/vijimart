@@ -33,22 +33,28 @@ const Cart: React.FC = () => {
     }
   };
 
-  const deleteSelected = () => {
-    selectedItems.forEach(itemId => {
+  const deleteSelected = async () => {
+    // Delete items sequentially to avoid server overload
+    for (const itemId of selectedItems) {
       const item = items.find(i => (i.id || i._id) === itemId);
       if (item) {
         const productId = typeof item.product === 'string' ? item.product : (item.product?._id || item.product?.id);
-        removeItem(productId);
+        await removeItem(productId);
+        // Small delay between requests
+        await new Promise(resolve => setTimeout(resolve, 100));
       }
-    });
+    }
     setSelectedItems(new Set());
   };
 
-  const deleteAll = () => {
-    items.forEach(item => {
+  const deleteAll = async () => {
+    // Delete items sequentially to avoid server overload
+    for (const item of items) {
       const productId = typeof item.product === 'string' ? item.product : (item.product?._id || item.product?.id);
-      removeItem(productId);
-    });
+      await removeItem(productId);
+      // Small delay between requests
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
     setSelectedItems(new Set());
   };
 

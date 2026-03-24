@@ -130,20 +130,21 @@ const AIGroceryPlanner = () => {
     if (!groceryList?.groceryList) return;
 
     try {
-      // Add all items to cart in parallel instead of sequentially
-      const addPromises = groceryList.groceryList.map(item => {
-        if (item.productId) {
-          return addToCart(item.productId, item.quantity || 1)
-            .catch(err => {
-              console.error(`Failed to add ${item.name}:`, err);
-              return null;
-            });
-        }
-        return Promise.resolve(null);
-      });
+      let addedCount = 0;
 
-      const results = await Promise.all(addPromises);
-      const addedCount = results.filter(r => r !== null).length;
+      // Add items sequentially with delay to avoid overwhelming the server
+      for (const item of groceryList.groceryList) {
+        if (item.productId) {
+          try {
+            await addToCart(item.productId, item.quantity || 1);
+            addedCount++;
+            // Small delay between requests to prevent server overload
+            await new Promise(resolve => setTimeout(resolve, 100));
+          } catch (err) {
+            console.error(`Failed to add ${item.name}:`, err);
+          }
+        }
+      }
 
       toast.success(`${addedCount} items added to cart!`);
       navigate('/cart');
