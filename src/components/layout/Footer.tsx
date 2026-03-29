@@ -70,13 +70,21 @@ const Footer: React.FC = () => {
 
       {/* Bottom bar */}
       <div>
-        <div className="container mx-auto px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p className="text-white/30 text-[11px] font-medium">
-            © {new Date().getFullYear()} Sri Vijiyalaxmi Super Mart. All rights reserved.
-          </p>
-          <div className="flex items-center gap-1.5 text-white/25 text-[11px]">
-            <Leaf className="h-2.5 w-2.5 text-primary/50" />
-            <span>Fresh · Quality · Trusted</span>
+        <div className="border-t border-white/10"></div>
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-2">
+            <p className="text-white/30 text-[11px] font-medium">
+              © {new Date().getFullYear()} Sri Vijiyalaxmi Super Mart. All rights reserved.
+            </p>
+            <div className="flex items-center gap-1.5 text-white/25 text-[11px]">
+              <Leaf className="h-2.5 w-2.5 text-primary/50" />
+              <span>Fresh · Quality · Trusted</span>
+            </div>
+          </div>
+          <div className="text-center">
+            <p className="text-white/40 dark:text-white/40 text-[10px] font-medium tracking-wide">
+              Developed by Dhiyanesh
+            </p>
           </div>
         </div>
       </div>
